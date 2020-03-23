@@ -5,7 +5,7 @@ extern crate log;
 
 use std::any::Any;
 use std::borrow::Cow;
-use std::fmt::Display;
+use std::fmt::{Debug, Display};
 use std::sync::mpsc::channel;
 use std::sync::Arc;
 use std::thread;
@@ -104,7 +104,7 @@ impl<T: Any> AsAny for T {
 ///     .expect("something wrong with downcast");
 /// assert_eq!(immutable.immutable(), 0)
 /// ```
-pub trait SkimItem: AsAny + Send + Sync + 'static {
+pub trait SkimItem: Debug + AsAny + Send + Sync + 'static {
     /// The content to be displayed on the item list, could contain ANSI properties
     fn display(&self) -> Cow<AnsiString>;
 
@@ -123,6 +123,10 @@ pub trait SkimItem: AsAny + Send + Sync + 'static {
     /// want, you could still use `downcast` to retain the pointer to the original struct.
     fn output(&self) -> Cow<str> {
         self.text()
+    }
+
+    fn raw(&self) -> Self {
+        self.clone()
     }
 
     /// we could limit the matching ranges of the `get_text` of the item.
